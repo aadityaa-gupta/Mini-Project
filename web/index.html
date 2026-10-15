@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Library Management System | College Mini Project</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Top App Navigation -->
+    <header class="app-header">
+        <div class="header-left">
+            <div class="logo-box">
+                <span class="logo-icon">📖</span>
+                <div>
+                    <h1 class="logo-title">Libraria<span class="highlight">Pro</span></h1>
+                    <p class="logo-sub">College Library Management System</p>
+                </div>
+            </div>
+            <div class="badge-marks">100 MARKS MINI PROJECT</div>
+        </div>
+        <div class="header-right">
+            <div class="student-tag">
+                <span class="dot-online"></span>
+                <span class="dev-name">Aditya • CSE</span>
+            </div>
+            <div class="tech-stack-pills">
+                <span class="pill pill-java">Java 25</span>
+                <span class="pill pill-sql">SQL</span>
+                <span class="pill pill-html">HTML5</span>
+                <span class="pill pill-css">CSS3</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Navigation Tabs Bar -->
+    <nav class="nav-bar">
+        <button class="nav-tab active" data-tab="dashboard">
+            <span class="tab-icon">📊</span> Dashboard
+        </button>
+        <button class="nav-tab" data-tab="books">
+            <span class="tab-icon">📚</span> Book Inventory
+        </button>
+        <button class="nav-tab" data-tab="members">
+            <span class="tab-icon">🎓</span> Student Members
+        </button>
+        <button class="nav-tab" data-tab="issue-return">
+            <span class="tab-icon">🔄</span> Issue & Return
+        </button>
+        <button class="nav-tab" data-tab="transactions">
+            <span class="tab-icon">📜</span> History Log
+        </button>
+        <button class="nav-tab" data-tab="sql-viva">
+            <span class="tab-icon">💾</span> SQL Schema & Viva
+        </button>
+    </nav>
+
+    <!-- Main Container -->
+    <main class="main-content">
+
+        <!-- ========================================== -->
+        <!-- TAB 1: DASHBOARD -->
+        <!-- ========================================== -->
+        <section id="tab-dashboard" class="tab-pane active">
+            <!-- Welcome Banner -->
+            <div class="welcome-card">
+                <div class="welcome-text">
+                    <h2>Welcome to the Library Management System 👋</h2>
+                    <p>Track book inventory, student issues, returns, and overdue fines in real-time with pure Java backend and SQL integration.</p>
+                </div>
+                <div class="quick-actions">
+                    <button class="btn btn-primary" onclick="openModal('addBookModal')">+ Add Book</button>
+                    <button class="btn btn-secondary" onclick="openModal('addMemberModal')">+ Add Student</button>
+                    <button class="btn btn-accent" onclick="switchTab('issue-return')">⚡ Issue Book</button>
+                </div>
+            </div>
+
+            <!-- Stats Overview Cards -->
+            <div class="stats-grid">
+                <div class="stat-card stat-purple">
+                    <div class="stat-icon-wrapper">📚</div>
+                    <div class="stat-info">
+                        <span class="stat-label">Total Titles</span>
+                        <h3 class="stat-value" id="stat-total-titles">0</h3>
+                        <span class="stat-sub" id="stat-total-copies">0 Total Physical Copies</span>
+                    </div>
+                </div>
+
+                <div class="stat-card stat-green">
+                    <div class="stat-icon-wrapper">✅</div>
+                    <div class="stat-info">
+                        <span class="stat-label">Available In Stock</span>
+                        <h3 class="stat-value" id="stat-available-copies">0</h3>
+                        <span class="stat-sub">Ready for issue</span>
+                    </div>
+                </div>
+
+                <div class="stat-card stat-amber">
+                    <div class="stat-icon-wrapper">⏳</div>
+                    <div class="stat-info">
+                        <span class="stat-label">Currently Issued</span>
+                        <h3 class="stat-value" id="stat-issued-books">0</h3>
+                        <span class="stat-sub">Active student loans</span>
+                    </div>
+                </div>
+
+                <div class="stat-card stat-blue">
+                    <div class="stat-icon-wrapper">🎓</div>
+                    <div class="stat-info">
+                        <span class="stat-label">Registered Members</span>
+                        <h3 class="stat-value" id="stat-total-members">0</h3>
+                        <span class="stat-sub">Students & Faculty</span>
+                    </div>
+                </div>
+
+                <div class="stat-card stat-rose">
+                    <div class="stat-icon-wrapper">💰</div>
+                    <div class="stat-info">
+                        <span class="stat-label">Overdue Fines</span>
+                        <h3 class="stat-value" id="stat-total-fine">₹0.00</h3>
+                        <span class="stat-sub">₹5.00/day late policy</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Two-Column Section: Recent Loans & Popular Categories -->
+            <div class="dashboard-split">
+                <div class="card recent-loans-card">
+                    <div class="card-header">
+                        <h3>📋 Active Issued Books</h3>
+                        <button class="btn-text" onclick="switchTab('transactions')">View All &rarr;</button>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Student</th>
+                                    <th>Book Title</th>
+                                    <th>Due Date</th>
+                                    <th>Fine (₹)</th>
+                                </tr>
+                            </thead>
+                            <tbody id="dashboard-recent-tbody">
+                                <tr><td colspan="4" class="text-center">Loading active loans...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="card architecture-card">
+                    <div class="card-header">
+                        <h3>⚙️ Project Architecture (Viva Ready)</h3>
+                    </div>
+                    <div class="arch-content">
+                        <div class="arch-item">
+                            <span class="arch-badge">Frontend</span>
+                            <p><strong>Pure HTML5 + Modern CSS3</strong> with flexbox, CSS grid, glassmorphism card styling, responsive layouts, and zero external npm/node dependencies.</p>
+                        </div>
+                        <div class="arch-item">
+                            <span class="arch-badge">Backend</span>
+                            <p><strong>Pure Standard Java 25</strong> using JDK built-in <code>com.sun.net.httpserver.HttpServer</code> with custom REST route handlers and multi-threaded request processing.</p>
+                        </div>
+                        <div class="arch-item">
+                            <span class="arch-badge">Database</span>
+                            <p><strong>SQL Relational Schema</strong> (<code>database.sql</code>) featuring 3 normalized tables (<code>books</code>, <code>members</code>, <code>transactions</code>), foreign keys, and console query logging.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- TAB 2: BOOKS INVENTORY -->
+        <!-- ========================================== -->
+        <section id="tab-books" class="tab-pane">
+            <div class="toolbar-card">
+                <div class="search-box">
+                    <span class="search-icon">🔍</span>
+                    <input type="text" id="bookSearchInput" placeholder="Search by title, author, or ISBN..." oninput="filterBooks()">
+                </div>
+                <div class="filter-controls">
+                    <select id="bookCategoryFilter" onchange="filterBooks()">
+                        <option value="">All Categories</option>
+                        <option value="Computer Science">Computer Science</option>
+                        <option value="Programming">Programming</option>
+                        <option value="Database">Database</option>
+                        <option value="Networking">Networking</option>
+                        <option value="Software Engg">Software Engg</option>
+                    </select>
+                    <button class="btn btn-primary" onclick="openModal('addBookModal')">+ Add New Book</button>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h3>📚 Book Catalog (<span id="bookCountBadge">0</span> titles)</h3>
+                    <span class="table-hint">Green = In Stock, Red = Out of Stock</span>
+                </div>
+                <div class="table-responsive">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>#ID</th>
+                                <th>Title</th>
+                                <th>Author</th>
+                                <th>Category</th>
+                                <th>ISBN</th>
+                                <th>Total</th>
+                                <th>Available</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="booksTableBody">
+                            <tr><td colspan="9" class="text-center">Loading books...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- TAB 3: STUDENT MEMBERS -->
+        <!-- ========================================== -->
+        <section id="tab-members" class="tab-pane">
+            <div class="toolbar-card">
+                <div class="search-box">
+                    <span class="search-icon">🔍</span>
+                    <input type="text" id="memberSearchInput" placeholder="Search by student name, roll number, or department..." oninput="filterMembers()">
+                </div>
+                <button class="btn btn-primary" onclick="openModal('addMemberModal')">+ Register New Student</button>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h3>🎓 Registered Members (<span id="memberCountBadge">0</span> students)</h3>
+                </div>
+                <div class="table-responsive">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>#ID</th>
+                                <th>Roll Number</th>
+                                <th>Full Name</th>
+                                <th>Department</th>
+                                <th>Email</th>
+                                <th>Contact Phone</th>
+                                <th>Registered Date</th>
+                            </tr>
+                        </thead>
+                        <tbody id="membersTableBody">
+                            <tr><td colspan="7" class="text-center">Loading members...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- TAB 4: ISSUE & RETURN WORKFLOW -->
+        <!-- ========================================== -->
+        <section id="tab-issue-return" class="tab-pane">
+            <div class="issue-return-grid">
+                <!-- Issue Book Card -->
+                <div class="card workflow-card">
+                    <div class="card-header">
+                        <h3>📤 Issue Book to Student</h3>
+                        <span class="workflow-step">Step 1</span>
+                    </div>
+                    <form id="issueBookForm" onsubmit="handleIssueBook(event)">
+                        <div class="form-group">
+                            <label for="issueBookSelect">Select Book to Issue <span class="required">*</span></label>
+                            <select id="issueBookSelect" required>
+                                <option value="">-- Choose Available Book --</option>
+                            </select>
+                            <small class="form-help">Only books currently in stock are selectable.</small>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="issueMemberSelect">Select Student / Member <span class="required">*</span></label>
+                            <select id="issueMemberSelect" required>
+                                <option value="">-- Choose Student Member --</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="issueDays">Loan Duration (Days)</label>
+                            <input type="number" id="issueDays" value="14" min="1" max="60" required>
+                            <small class="form-help">Standard college loan duration is 14 days.</small>
+                        </div>
+
+                        <div class="due-preview-box">
+                            <span>Expected Due Date:</span>
+                            <strong id="expectedDueDateText">-</strong>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary btn-block">Confirm & Issue Book</button>
+                    </form>
+                </div>
+
+                <!-- Return Book Card -->
+                <div class="card workflow-card">
+                    <div class="card-header">
+                        <h3>📥 Return Book & Calculate Fine</h3>
+                        <span class="workflow-step">Step 2</span>
+                    </div>
+                    <form id="returnBookForm" onsubmit="handleReturnBook(event)">
+                        <div class="form-group">
+                            <label for="returnTransactionSelect">Select Active Borrowed Book <span class="required">*</span></label>
+                            <select id="returnTransactionSelect" required onchange="updateReturnFinePreview()">
+                                <option value="">-- Choose Active Loan --</option>
+                            </select>
+                        </div>
+
+                        <!-- Fine Calculation Card Preview -->
+                        <div class="fine-preview-card" id="finePreviewBox">
+                            <div class="fine-row">
+                                <span>Borrower:</span>
+                                <strong id="fineBorrowerName">-</strong>
+                            </div>
+                            <div class="fine-row">
+                                <span>Due Date:</span>
+                                <strong id="fineDueDate">-</strong>
+                            </div>
+                            <div class="fine-row">
+                                <span>Late Fine Penalty:</span>
+                                <strong id="finePenaltyAmount" class="fine-amt">₹0.00</strong>
+                            </div>
+                            <small class="fine-note">*Calculated automatically at ₹5.00 per overdue day.</small>
+                        </div>
+
+                        <button type="submit" class="btn btn-accent btn-block">Process Return & Restock</button>
+                    </form>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- TAB 5: TRANSACTION HISTORY -->
+        <!-- ========================================== -->
+        <section id="tab-transactions" class="tab-pane">
+            <div class="toolbar-card">
+                <div class="search-box">
+                    <span class="search-icon">🔍</span>
+                    <input type="text" id="transactionSearchInput" placeholder="Filter by student name, roll number, or book title..." oninput="filterTransactions()">
+                </div>
+                <div class="filter-controls">
+                    <select id="transactionStatusFilter" onchange="filterTransactions()">
+                        <option value="">All Statuses</option>
+                        <option value="ISSUED">Currently Issued</option>
+                        <option value="RETURNED">Returned</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h3>📜 Complete Issue & Return History Log</h3>
+                </div>
+                <div class="table-responsive">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>#Trans ID</th>
+                                <th>Student Roll</th>
+                                <th>Student Name</th>
+                                <th>Book Title</th>
+                                <th>Issue Date</th>
+                                <th>Due Date</th>
+                                <th>Return Date</th>
+                                <th>Fine</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="transactionsTableBody">
+                            <tr><td colspan="9" class="text-center">Loading transactions...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- TAB 6: SQL SCHEMA & VIVA CHEAT SHEET -->
+        <!-- ========================================== -->
+        <section id="tab-sql-viva" class="tab-pane">
+            <div class="viva-grid">
+                <div class="card viva-card">
+                    <div class="card-header">
+                        <h3>💾 Relational Database Schema (SQL)</h3>
+                        <span class="badge badge-info">database.sql</span>
+                    </div>
+                    <div class="code-preview">
+                        <pre><code>-- 1. BOOKS TABLE
+CREATE TABLE books (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    title VARCHAR(150) NOT NULL,
+    author VARCHAR(100) NOT NULL,
+    category VARCHAR(50) NOT NULL,
+    isbn VARCHAR(20) UNIQUE NOT NULL,
+    total_copies INT NOT NULL DEFAULT 1,
+    available_copies INT NOT NULL DEFAULT 1,
+    added_date DATE NOT NULL
+);
+
+-- 2. MEMBERS TABLE
+CREATE TABLE members (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    roll_no VARCHAR(20) UNIQUE NOT NULL,
+    name VARCHAR(100) NOT NULL,
+    department VARCHAR(50) NOT NULL,
+    email VARCHAR(100) NOT NULL,
+    phone VARCHAR(15) NOT NULL,
+    join_date DATE NOT NULL
+);
+
+-- 3. TRANSACTIONS TABLE (With Foreign Keys)
+CREATE TABLE transactions (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    book_id INT NOT NULL,
+    member_id INT NOT NULL,
+    issue_date DATE NOT NULL,
+    due_date DATE NOT NULL,
+    return_date DATE NULL,
+    fine_amount DECIMAL(6, 2) DEFAULT 0.00,
+    status VARCHAR(20) NOT NULL DEFAULT 'ISSUED',
+    CONSTRAINT fk_trans_book FOREIGN KEY (book_id) REFERENCES books(id),
+    CONSTRAINT fk_trans_member FOREIGN KEY (member_id) REFERENCES members(id)
+);</code></pre>
+                    </div>
+                </div>
+
+                <div class="card viva-card">
+                    <div class="card-header">
+                        <h3>🎓 Top College Viva Questions & Answers</h3>
+                        <span class="badge badge-success">For 100 Marks</span>
+                    </div>
+                    <div class="qa-accordion">
+                        <div class="qa-item">
+                            <h4>Q1: How does Java communicate with the browser without external libraries?</h4>
+                            <p><strong>Ans:</strong> We use standard Java's built-in <code>com.sun.net.httpserver.HttpServer</code>. It binds to port 8080 and registers custom <code>HttpHandler</code> implementations for REST endpoints like <code>/api/books</code> and <code>/api/issue</code>. Frontend JavaScript calls these via standard <code>fetch()</code> API.</p>
+                        </div>
+                        <div class="qa-item">
+                            <h4>Q2: How are relationships represented in the SQL Database?</h4>
+                            <p><strong>Ans:</strong> The <code>transactions</code> table acts as an associative entity linking <code>books(id)</code> via <code>FOREIGN KEY (book_id)</code> and <code>members(id)</code> via <code>FOREIGN KEY (member_id)</code>. This satisfies 3NF (Third Normal Form) and prevents data redundancy.</p>
+                        </div>
+                        <div class="qa-item">
+                            <h4>Q3: What happens to inventory when a book is issued or returned?</h4>
+                            <p><strong>Ans:</strong> In our Business Logic (DAO/DBManager), when a book is issued, we execute <code>UPDATE books SET available_copies = available_copies - 1 WHERE id = ?</code>. When returned, we increment it back and calculate any overdue fine based on days exceeded beyond the due date.</p>
+                        </div>
+                        <div class="qa-item">
+                            <h4>Q4: Why did we choose this architecture?</h4>
+                            <p><strong>Ans:</strong> It provides 100% portability. Because no npm, node, or heavy container servers are required, any student or evaluator can run it instantly using just standard Java compiler (`javac`) and JVM (`java`).</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- ========================================== -->
+    <!-- MODAL 1: ADD BOOK -->
+    <!-- ========================================== -->
+    <div id="addBookModal" class="modal-overlay">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h3>📖 Add New Book to Library</h3>
+                <button class="modal-close" onclick="closeModal('addBookModal')">&times;</button>
+            </div>
+            <form id="addBookForm" onsubmit="handleAddBook(event)">
+                <div class="form-group">
+                    <label for="bookTitle">Book Title <span class="required">*</span></label>
+                    <input type="text" id="bookTitle" required placeholder="e.g. Operating System Concepts">
+                </div>
+                <div class="form-group">
+                    <label for="bookAuthor">Author Name <span class="required">*</span></label>
+                    <input type="text" id="bookAuthor" required placeholder="e.g. Silberschatz & Galvin">
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="bookCategory">Category <span class="required">*</span></label>
+                        <select id="bookCategory" required>
+                            <option value="Computer Science">Computer Science</option>
+                            <option value="Programming">Programming</option>
+                            <option value="Database">Database</option>
+                            <option value="Networking">Networking</option>
+                            <option value="Software Engg">Software Engg</option>
+                            <option value="Electronics">Electronics</option>
+                            <option value="Mathematics">Mathematics</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="bookCopies">Total Copies <span class="required">*</span></label>
+                        <input type="number" id="bookCopies" value="5" min="1" max="100" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="bookIsbn">ISBN Number</label>
+                    <input type="text" id="bookIsbn" placeholder="e.g. 9780132350884">
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('addBookModal')">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Book to Database</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- MODAL 2: ADD MEMBER -->
+    <!-- ========================================== -->
+    <div id="addMemberModal" class="modal-overlay">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h3>🎓 Register Student Member</h3>
+                <button class="modal-close" onclick="closeModal('addMemberModal')">&times;</button>
+            </div>
+            <form id="addMemberForm" onsubmit="handleAddMember(event)">
+                <div class="form-group">
+                    <label for="memberRollNo">Roll Number / Student ID <span class="required">*</span></label>
+                    <input type="text" id="memberRollNo" required placeholder="e.g. CS202615">
+                </div>
+                <div class="form-group">
+                    <label for="memberName">Full Name <span class="required">*</span></label>
+                    <input type="text" id="memberName" required placeholder="e.g. Aditya Sharma">
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="memberDept">Department <span class="required">*</span></label>
+                        <select id="memberDept" required>
+                            <option value="Computer Science">Computer Science</option>
+                            <option value="Information Tech">Information Tech</option>
+                            <option value="Electronics">Electronics</option>
+                            <option value="Mechanical">Mechanical</option>
+                            <option value="Civil">Civil</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="memberPhone">Contact Phone <span class="required">*</span></label>
+                        <input type="tel" id="memberPhone" required placeholder="e.g. 9876543210">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="memberEmail">Email Address</label>
+                    <input type="email" id="memberEmail" placeholder="e.g. student@cllg.edu">
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('addMemberModal')">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Register Student</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Toast Notification Container -->
+    <div id="toastContainer" class="toast-container"></div>
+
+    <script src="app.js"></script>
+</body>
+</html>
