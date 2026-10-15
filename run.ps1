@@ -1,44 +1,48 @@
 # College Mini Project - Library Management System (PowerShell Launcher)
 Set-Location -Path $PSScriptRoot
 
-Write-Host "======================================================================" -ForegroundColor Green
-Write-Host "   COLLEGE MINI PROJECT: LIBRARY MANAGEMENT SYSTEM (100 MARKS)" -ForegroundColor Green
-Write-Host "   Developer: Aditya" -ForegroundColor Green
-Write-Host "   Tech Stack: Java 25 + HTML5 + CSS3 + SQL (Zero NPM / No Frameworks)" -ForegroundColor Green
-Write-Host "======================================================================" -ForegroundColor Green
+Write-Host "======================================================================" -ForegroundColor Cyan
+Write-Host "   COLLEGE MINI PROJECT: LIBRARY MANAGEMENT SYSTEM (100 MARKS)" -ForegroundColor Cyan
+Write-Host "   Developer: Aditya" -ForegroundColor Cyan
+Write-Host "   Tech Stack: Full-Stack TypeScript + Node.js + Express + SQL" -ForegroundColor Cyan
+Write-Host "======================================================================" -ForegroundColor Cyan
 Write-Host ""
 
-# Step 1: Check Java & Javac
-if (-not (Get-Command java -ErrorAction SilentlyContinue)) {
-    Write-Host "[ERROR] Java is not installed or not in PATH!" -ForegroundColor Red
+# Step 1: Check Node.js
+if (-not (Get-Command node -ErrorAction SilentlyContinue)) {
+    Write-Host "[ERROR] Node.js is not installed or not in PATH!" -ForegroundColor Red
+    Write-Host "Please install Node.js from https://nodejs.org/" -ForegroundColor Yellow
     pause
     exit 1
 }
 
-if (-not (Get-Command javac -ErrorAction SilentlyContinue)) {
-    Write-Host "[ERROR] javac (Java Compiler) was not found in PATH!" -ForegroundColor Red
-    pause
-    exit 1
+# Step 2: Install dependencies if missing
+if (-not (Test-Path "node_modules")) {
+    Write-Host "[1/3] First-time setup: Installing project dependencies..." -ForegroundColor Yellow
+    & cmd.exe /c "npm install"
+    if ($LASTEXITCODE -ne 0) {
+        Write-Host "[ERROR] npm install failed!" -ForegroundColor Red
+        pause
+        exit 1
+    }
+    Write-Host "[OK] Dependencies installed successfully!" -ForegroundColor Green
+    Write-Host ""
 }
 
-# Step 2: Compile
-Write-Host "[1/3] Compiling Java classes into bin/ directory..." -ForegroundColor Cyan
-if (-not (Test-Path "bin")) {
-    New-Item -ItemType Directory -Path "bin" | Out-Null
-}
-
-javac -encoding UTF-8 -cp "src" -d "bin" src/models/*.java src/DBManager.java src/LibraryApp.java
+# Step 3: Compile TypeScript
+Write-Host "[2/3] Compiling TypeScript source files into dist/ and web/app.js..." -ForegroundColor Cyan
+& cmd.exe /c "npm run build"
 if ($LASTEXITCODE -ne 0) {
-    Write-Host "[ERROR] Compilation failed!" -ForegroundColor Red
+    Write-Host "[ERROR] TypeScript compilation failed!" -ForegroundColor Red
     pause
     exit 1
 }
-Write-Host "[OK] Compilation successful!" -ForegroundColor Green
+Write-Host "[OK] TypeScript compilation successful!" -ForegroundColor Green
 Write-Host ""
 
-# Step 3: Start Server
-Write-Host "[2/3] Starting Library Management HTTP Server on port 8080..." -ForegroundColor Cyan
-Write-Host "[3/3] The dashboard will open in your browser automatically!" -ForegroundColor Cyan
+# Step 4: Start Server
+Write-Host "[3/3] Starting Library Management Server on port 8080..." -ForegroundColor Cyan
+Write-Host "The dashboard will open in your default browser automatically!" -ForegroundColor Cyan
 
 Write-Host ""
 Write-Host "======================================================================" -ForegroundColor Yellow
@@ -48,4 +52,4 @@ Write-Host "Press Ctrl + C to stop the server anytime." -ForegroundColor Yellow
 Write-Host "======================================================================" -ForegroundColor Yellow
 Write-Host ""
 
-java -cp bin LibraryApp
+node dist/server/server.js

@@ -183,6 +183,8 @@ body {
     border-radius: 6px;
 }
 
+.pill-ts { background: rgba(49, 120, 198, 0.22); color: #93c5fd; border: 1px solid rgba(49, 120, 198, 0.45); }
+.pill-node { background: rgba(34, 197, 94, 0.18); color: #86efac; border: 1px solid rgba(34, 197, 94, 0.35); }
 .pill-java { background: rgba(239, 68, 68, 0.18); color: #fca5a5; border: 1px solid rgba(239, 68, 68, 0.3); }
 .pill-sql { background: rgba(59, 130, 246, 0.18); color: #93c5fd; border: 1px solid rgba(59, 130, 246, 0.3); }
 .pill-html { background: rgba(249, 115, 22, 0.18); color: #fdba74; border: 1px solid rgba(249, 115, 22, 0.3); }
