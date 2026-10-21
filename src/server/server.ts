@@ -3,6 +3,7 @@ import cors from 'cors';
 import path from 'path';
 import { exec } from 'child_process';
 import { DBManager } from './DBManager';
+import { firebaseService } from './firebaseService';
 
 /**
  * ====================================================================
@@ -11,7 +12,7 @@ import { DBManager } from './DBManager';
  * Main Server Application: server.ts
  *
  * Full-Stack TypeScript Architecture (Node.js + Express + TypeScript)
- * Features: Type-safe REST APIs, Live SQL query logging, CSV persistence
+ * Features: Type-safe REST APIs, Live SQL query logging, Firebase persistence
  * ====================================================================
  */
 
@@ -33,8 +34,13 @@ app.use(express.static(webDir));
 
 // 4. REST API Endpoints
 
+// GET /api/firebase-status
+app.get(['/api/firebase-status', '/firebase-status'], (_req: Request, res: Response) => {
+    res.json(firebaseService.getStatus());
+});
+
 // GET /api/stats
-app.get('/api/stats', (_req: Request, res: Response) => {
+app.get(['/api/stats', '/stats'], (_req: Request, res: Response) => {
     try {
         const stats = db.getStats();
         res.json(stats);
@@ -44,7 +50,7 @@ app.get('/api/stats', (_req: Request, res: Response) => {
 });
 
 // GET /api/books
-app.get('/api/books', (_req: Request, res: Response) => {
+app.get(['/api/books', '/books'], (_req: Request, res: Response) => {
     try {
         const books = db.getAllBooks();
         res.json(books);
@@ -54,7 +60,7 @@ app.get('/api/books', (_req: Request, res: Response) => {
 });
 
 // POST /api/books (Supports Add Book and Delete Book action)
-app.post('/api/books', (req: Request, res: Response) => {
+app.post(['/api/books', '/books'], (req: Request, res: Response) => {
     try {
         const body = req.body || {};
 
@@ -93,7 +99,7 @@ app.post('/api/books', (req: Request, res: Response) => {
 });
 
 // DELETE /api/books?id=...
-app.delete('/api/books', (req: Request, res: Response) => {
+app.delete(['/api/books', '/books'], (req: Request, res: Response) => {
     try {
         const id = parseInt(req.query.id as string, 10);
         if (isNaN(id)) {
@@ -113,7 +119,7 @@ app.delete('/api/books', (req: Request, res: Response) => {
 });
 
 // GET /api/members
-app.get('/api/members', (_req: Request, res: Response) => {
+app.get(['/api/members', '/members'], (_req: Request, res: Response) => {
     try {
         const members = db.getAllMembers();
         res.json(members);
@@ -123,7 +129,7 @@ app.get('/api/members', (_req: Request, res: Response) => {
 });
 
 // POST /api/members
-app.post('/api/members', (req: Request, res: Response) => {
+app.post(['/api/members', '/members'], (req: Request, res: Response) => {
     try {
         const body = req.body || {};
         const rollNo = (body.rollNo || '').trim();
@@ -145,7 +151,7 @@ app.post('/api/members', (req: Request, res: Response) => {
 });
 
 // GET /api/transactions
-app.get('/api/transactions', (_req: Request, res: Response) => {
+app.get(['/api/transactions', '/transactions'], (_req: Request, res: Response) => {
     try {
         const transactions = db.getAllTransactions();
         res.json(transactions);
@@ -155,7 +161,7 @@ app.get('/api/transactions', (_req: Request, res: Response) => {
 });
 
 // POST /api/issue
-app.post('/api/issue', (req: Request, res: Response) => {
+app.post(['/api/issue', '/issue'], (req: Request, res: Response) => {
     try {
         const body = req.body || {};
         const bookId = parseInt(body.bookId, 10);
@@ -186,7 +192,7 @@ app.post('/api/issue', (req: Request, res: Response) => {
 });
 
 // POST /api/return
-app.post('/api/return', (req: Request, res: Response) => {
+app.post(['/api/return', '/return'], (req: Request, res: Response) => {
     try {
         const body = req.body || {};
         const transactionId = parseInt(body.transactionId, 10);
@@ -219,30 +225,34 @@ app.use((_req: Request, res: Response) => {
     res.sendFile(path.join(webDir, 'index.html'));
 });
 
-// 5. Start Server
-app.listen(PORT, () => {
-    console.log('==================================================================');
-    console.log('   COLLEGE MINI PROJECT: LIBRARY MANAGEMENT SYSTEM (100 MARKS)   ');
-    console.log('   Developer: Aditya | Tech: TypeScript + Node.js + Express + SQL ');
-    console.log('==================================================================');
-    console.log(`\n>>> SUCCESS: Library Management Server is RUNNING on port ${PORT}!`);
-    console.log(`>>> Local Web Dashboard: http://127.0.0.1:${PORT} (or http://localhost:${PORT})`);
-    console.log('>>> Press Ctrl+C in terminal to stop server.\n');
-    console.log('------------------------------------------------------------------');
-    console.log('SQL LOG STREAM (Queries will display here during UI actions):');
-    console.log('------------------------------------------------------------------');
+// 5. Start Server (Only in local Node.js environment, Vercel Serverless handles execution automatically)
+if (!process.env.VERCEL) {
+    app.listen(PORT, () => {
+        console.log('==================================================================');
+        console.log('   COLLEGE MINI PROJECT: LIBRARY MANAGEMENT SYSTEM (100 MARKS)   ');
+        console.log('   Developer: Aditya | Tech: TypeScript + Node.js + Express + SQL ');
+        console.log('   Cloud Database: Google Cloud Firestore (Firebase) Connected   ');
+        console.log('==================================================================');
+        console.log(`\n>>> SUCCESS: Library Management Server is RUNNING on port ${PORT}!`);
+        console.log(`>>> Local Web Dashboard: http://127.0.0.1:${PORT} (or http://localhost:${PORT})`);
+        console.log('>>> Press Ctrl+C in terminal to stop server.\n');
+        console.log('------------------------------------------------------------------');
+        console.log('SQL LOG STREAM (Queries will display here during UI actions):');
+        console.log('------------------------------------------------------------------');
 
-    // Automatically open browser on startup
-    const url = `http://127.0.0.1:${PORT}`;
-    const openCmd = process.platform === 'win32'
-        ? `start "" "${url}"`
-        : process.platform === 'darwin'
-        ? `open "${url}"`
-        : `xdg-open "${url}"`;
+        // Automatically open browser on startup
+        const url = `http://127.0.0.1:${PORT}`;
+        const openCmd = process.platform === 'win32'
+            ? `start "" "${url}"`
+            : process.platform === 'darwin'
+            ? `open "${url}"`
+            : `xdg-open "${url}"`;
 
-    exec(openCmd, (err) => {
-        if (err) {
+        exec(openCmd, (_err) => {
             // Silently ignore browser open errors (e.g. headless environments)
-        }
+        });
     });
-});
+}
+
+export default app;
+export { app };

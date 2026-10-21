@@ -4,16 +4,19 @@ import { Book } from './models/Book';
 import { Member } from './models/Member';
 import { Transaction } from './models/Transaction';
 import { StatsResponse } from '../shared/types';
+import { firebaseService } from './firebaseService';
 
 /**
  * DBManager (TypeScript Database & Data Access Layer)
  * -------------------------------------------------------------
  * 1. Simulates and logs authentic SQL Queries to the console.
- * 2. Persists all records (books, members, transactions) into a local CSV data directory.
- * 3. Provides clean CRUD operations for books, members, issues, and returns.
- * 4. Pre-loaded with standard college library sample records.
+ * 2. Connects to Google Cloud Firestore (Firebase) for cloud persistence.
+ * 3. Persists all records (books, members, transactions) into CSV data directory.
+ * 4. Provides clean CRUD operations for books, members, issues, and returns.
+ * 5. Pre-loaded with standard college library sample records.
  */
 export class DBManager {
+    private root: string;
     private dataDir: string;
     private booksFile: string;
     private membersFile: string;
@@ -28,19 +31,27 @@ export class DBManager {
     private nextTransactionId: number = 1;
 
     constructor(baseDir?: string) {
-        const root = baseDir || process.cwd();
-        this.dataDir = path.join(root, 'data');
+        this.root = baseDir || process.cwd();
+        const isVercel = Boolean(process.env.VERCEL);
+        const sourceDataDir = path.join(this.root, 'data');
+        this.dataDir = isVercel ? path.join('/tmp', 'data') : sourceDataDir;
         this.booksFile = path.join(this.dataDir, 'books.csv');
         this.membersFile = path.join(this.dataDir, 'members.csv');
         this.transactionsFile = path.join(this.dataDir, 'transactions.csv');
 
         this.initDataDirectory();
         this.loadOrSeedData();
+        // Asynchronously sync with Firebase Cloud Firestore
+        this.syncWithFirebase();
     }
 
     private initDataDirectory(): void {
-        if (!fs.existsSync(this.dataDir)) {
-            fs.mkdirSync(this.dataDir, { recursive: true });
+        try {
+            if (!fs.existsSync(this.dataDir)) {
+                fs.mkdirSync(this.dataDir, { recursive: true });
+            }
+        } catch (e: any) {
+            console.warn('[DBManager] initDataDirectory notice:', e?.message);
         }
     }
 
@@ -48,6 +59,28 @@ export class DBManager {
      * Loads existing data from files, or seeds realistic default college data.
      */
     private loadOrSeedData(): void {
+        const isVercel = Boolean(process.env.VERCEL);
+        const sourceDataDir = path.join(this.root, 'data');
+
+        // On Vercel, copy seed files from source data folder to /tmp/data if not already present
+        if (isVercel && this.dataDir !== sourceDataDir) {
+            try {
+                if (!fs.existsSync(this.dataDir)) {
+                    fs.mkdirSync(this.dataDir, { recursive: true });
+                }
+                const files = ['books.csv', 'members.csv', 'transactions.csv'];
+                for (const f of files) {
+                    const src = path.join(sourceDataDir, f);
+                    const dest = path.join(this.dataDir, f);
+                    if (fs.existsSync(src) && !fs.existsSync(dest)) {
+                        fs.copyFileSync(src, dest);
+                    }
+                }
+            } catch (err: any) {
+                console.warn('[DBManager] Notice: Could not sync to /tmp, using in-memory defaults:', err?.message);
+            }
+        }
+
         const hasBooks = fs.existsSync(this.booksFile);
         const hasMembers = fs.existsSync(this.membersFile);
         const hasTrans = fs.existsSync(this.transactionsFile);
@@ -61,6 +94,49 @@ export class DBManager {
             console.log('[DBManager] Initializing new database with default college library data...');
             this.seedDefaultData();
             this.saveAll();
+        }
+    }
+
+    /**
+     * Syncs records bidirectionally with Firebase Cloud Firestore.
+     */
+    public async syncWithFirebase(): Promise<void> {
+        try {
+            console.log('[DBManager] Connecting to Firebase Cloud Firestore (Project: mini-2b749)...');
+            const fbBooks = await firebaseService.fetchBooks();
+            const fbMembers = await firebaseService.fetchMembers();
+            const fbTrans = await firebaseService.fetchTransactions();
+
+            const hasRemoteData = (fbBooks && fbBooks.length > 0) || 
+                                  (fbMembers && fbMembers.length > 0) || 
+                                  (fbTrans && fbTrans.length > 0);
+
+            if (hasRemoteData) {
+                if (fbBooks && fbBooks.length > 0) {
+                    this.books.clear();
+                    fbBooks.forEach(b => this.addBookInternal(b));
+                }
+                if (fbMembers && fbMembers.length > 0) {
+                    this.members.clear();
+                    fbMembers.forEach(m => this.addMemberInternal(m));
+                }
+                if (fbTrans && fbTrans.length > 0) {
+                    this.transactions.clear();
+                    fbTrans.forEach(t => this.addTransactionInternal(t));
+                }
+                this.saveAll();
+                console.log(`[DBManager] Successfully synced ${this.books.size} books, ${this.members.size} members, and ${this.transactions.size} transactions from Cloud Firestore!`);
+            } else if (fbBooks !== null && fbMembers !== null && fbTrans !== null) {
+                // Connected but collection is empty in Firestore: Seed local data to Firestore
+                console.log('[DBManager] Firestore is connected. Seeding initial records to Cloud Firestore...');
+                await firebaseService.seedInitialData(
+                    Array.from(this.books.values()),
+                    Array.from(this.members.values()),
+                    Array.from(this.transactions.values())
+                );
+            }
+        } catch (e: any) {
+            console.warn('[DBManager] Firebase sync notice:', e?.message);
         }
     }
 
@@ -133,6 +209,7 @@ export class DBManager {
         );
 
         this.saveBooks();
+        firebaseService.saveBook(b);
         return b;
     }
 
@@ -150,6 +227,7 @@ export class DBManager {
         this.books.delete(id);
         console.log(`[SQL LOG]: DELETE FROM books WHERE id = ${id};`);
         this.saveBooks();
+        firebaseService.deleteBook(id);
         return true;
     }
 
@@ -176,6 +254,7 @@ export class DBManager {
         );
 
         this.saveMembers();
+        firebaseService.saveMember(m);
         return m;
     }
 
@@ -266,6 +345,8 @@ export class DBManager {
 
         this.saveBooks();
         this.saveTransactions();
+        firebaseService.saveTransaction(t);
+        firebaseService.saveBook(b);
         return t;
     }
 
@@ -311,6 +392,7 @@ export class DBManager {
         if (b) {
             b.availableCopies = Math.min(b.totalCopies, b.availableCopies + 1);
             console.log(`[SQL LOG]: UPDATE books SET available_copies = ${b.availableCopies} WHERE id = ${b.id};`);
+            firebaseService.saveBook(b);
         }
 
         console.log(
@@ -319,6 +401,7 @@ export class DBManager {
 
         this.saveBooks();
         this.saveTransactions();
+        firebaseService.saveTransaction(t);
         return t;
     }
 
@@ -350,7 +433,8 @@ export class DBManager {
             availableCopies: totalAvailableCopies,
             issuedBooks: activeIssuedCount,
             totalMembers: this.members.size,
-            totalFine: totalFine.toFixed(2)
+            totalFine: totalFine.toFixed(2),
+            firebaseConnected: firebaseService.getStatus().connected
         };
     }
 

@@ -51,6 +51,7 @@ export interface StatsResponse {
     issuedBooks: number;
     totalMembers: number;
     totalFine: string;
+    firebaseConnected?: boolean;
 }
 
 export interface ApiResponse<T = unknown> {
