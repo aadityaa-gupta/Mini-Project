@@ -21,20 +21,14 @@
                     <p class="logo-sub">College Library Management System</p>
                 </div>
             </div>
-            <div class="badge-marks">100 MARKS MINI PROJECT</div>
+            
         </div>
         <div class="header-right">
             <div class="student-tag">
                 <span class="dot-online"></span>
                 <span class="dev-name">Aditya • CSE</span>
             </div>
-            <div class="tech-stack-pills">
-                <span class="pill pill-ts">TypeScript</span>
-                <span class="pill pill-node">Node.js</span>
-                <span class="pill pill-sql">SQL</span>
-                <span class="pill pill-html">HTML5</span>
-                <span class="pill pill-css">CSS3</span>
-            </div>
+           
         </div>
     </header>
 
@@ -387,83 +381,8 @@
 
         <!-- ========================================== -->
         <!-- TAB 6: SQL SCHEMA & VIVA CHEAT SHEET -->
-        <!-- ========================================== -->
-        <section id="tab-sql-viva" class="tab-pane">
-            <div class="viva-grid">
-                <div class="card viva-card">
-                    <div class="card-header">
-                        <h3>💾 Relational Database Schema (SQL)</h3>
-                        <span class="badge badge-info">database.sql</span>
-                    </div>
-                    <div class="code-preview">
-                        <pre><code>-- 1. BOOKS TABLE
-CREATE TABLE books (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    title VARCHAR(150) NOT NULL,
-    author VARCHAR(100) NOT NULL,
-    category VARCHAR(50) NOT NULL,
-    isbn VARCHAR(20) UNIQUE NOT NULL,
-    total_copies INT NOT NULL DEFAULT 1,
-    available_copies INT NOT NULL DEFAULT 1,
-    added_date DATE NOT NULL
-);
-
--- 2. MEMBERS TABLE
-CREATE TABLE members (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    roll_no VARCHAR(20) UNIQUE NOT NULL,
-    name VARCHAR(100) NOT NULL,
-    department VARCHAR(50) NOT NULL,
-    email VARCHAR(100) NOT NULL,
-    phone VARCHAR(15) NOT NULL,
-    join_date DATE NOT NULL
-);
-
--- 3. TRANSACTIONS TABLE (With Foreign Keys)
-CREATE TABLE transactions (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    book_id INT NOT NULL,
-    member_id INT NOT NULL,
-    issue_date DATE NOT NULL,
-    due_date DATE NOT NULL,
-    return_date DATE NULL,
-    fine_amount DECIMAL(6, 2) DEFAULT 0.00,
-    status VARCHAR(20) NOT NULL DEFAULT 'ISSUED',
-    CONSTRAINT fk_trans_book FOREIGN KEY (book_id) REFERENCES books(id),
-    CONSTRAINT fk_trans_member FOREIGN KEY (member_id) REFERENCES members(id)
-);</code></pre>
-                    </div>
-                </div>
-
-                <div class="card viva-card">
-                    <div class="card-header">
-                        <h3>🎓 Top College Viva Questions & Answers</h3>
-                        <span class="badge badge-success">For 100 Marks</span>
-                    </div>
-                    <div class="qa-accordion">
-                        <div class="qa-item">
-                            <h4>Q1: How does Java communicate with the browser without external libraries?</h4>
-                            <p><strong>Ans:</strong> We use standard Java's built-in <code>com.sun.net.httpserver.HttpServer</code>. It binds to port 8080 and registers custom <code>HttpHandler</code> implementations for REST endpoints like <code>/api/books</code> and <code>/api/issue</code>. Frontend JavaScript calls these via standard <code>fetch()</code> API.</p>
-                        </div>
-                        <div class="qa-item">
-                            <h4>Q2: How are relationships represented in the SQL Database?</h4>
-                            <p><strong>Ans:</strong> The <code>transactions</code> table acts as an associative entity linking <code>books(id)</code> via <code>FOREIGN KEY (book_id)</code> and <code>members(id)</code> via <code>FOREIGN KEY (member_id)</code>. This satisfies 3NF (Third Normal Form) and prevents data redundancy.</p>
-                        </div>
-                        <div class="qa-item">
-                            <h4>Q3: What happens to inventory when a book is issued or returned?</h4>
-                            <p><strong>Ans:</strong> In our Business Logic (DAO/DBManager), when a book is issued, we execute <code>UPDATE books SET available_copies = available_copies - 1 WHERE id = ?</code>. When returned, we increment it back and calculate any overdue fine based on days exceeded beyond the due date.</p>
-                        </div>
-                        <div class="qa-item">
-                            <h4>Q4: Why did we choose this architecture?</h4>
-                            <p><strong>Ans:</strong> It provides 100% portability. Because no npm, node, or heavy container servers are required, any student or evaluator can run it instantly using just standard Java compiler (`javac`) and JVM (`java`).</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-    </main>
-
+    
+   
     <!-- ========================================== -->
     <!-- MODAL 1: ADD BOOK -->
     <!-- ========================================== -->
